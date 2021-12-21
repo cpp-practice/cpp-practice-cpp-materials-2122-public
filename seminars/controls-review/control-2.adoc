@@ -166,7 +166,8 @@ ifdef::backend-revealjs[=== !]
     . . . . .
 // функции упрощения
 protected:
-    virtual Expression* construct(Expression* lhs, Expression* rhs) const = 0;
+    virtual Expression* construct(
+        Expression* lhs, Expression* rhs) const = 0;
 public:
     Expression* simplify(const Context& ctx) const override {
         . . . . .
@@ -183,7 +184,8 @@ public:
 
 ifdef::backend-revealjs[=== !]
 
-Отличать константные выражения от неконстатных можно сделать несколькими способами. Какими?
+Отличать константные выражения от неконстатных можно сделать
+несколькими способами. Какими?
 
 ifdef::backend-revealjs[=== !]
 
@@ -231,7 +233,7 @@ private:
 
 - подстановка: `(x + y * z)` при y=2, z=3 => `(x + 2 * 3)`
 - упрощение: `(x + y * z)` при y=2, z=3 => `(x + 6)`
-- оптимизация: `(x + 0)` ==> `x`, `x * 1` => `x`, `x * 0` => `0`
+- оптимизация: `(x + 0)` => `x`, `x * 1` => `x`, `x * 0` => `0`
 
 Нам нужно было только упрощение, без оптимизации.
 
@@ -270,7 +272,7 @@ ifdef::backend-revealjs[=== !]
 Expression* Add::simplified(const Context& ctx) const {
     // если данное выражение можно вычислить как константу,
     return new Val(eval(ctx));
-    // в противном случае - реконструировать из упрощённых подвыражений
+    // иначе - реконструировать из упрощённых подвыражений
     return new Add(
         lhs_->simplified(ctx),
         rhs_->simplified(ctx));
@@ -288,9 +290,11 @@ ifdef::backend-revealjs[=== !]
 
 [source,cpp]
 ----
-Expression* Val::simplified(const Context& ctx) {
-    if (ctx.varIsSet(name_))
-        return new Val(ctx.getVar(name_));  // тут уж точно не будет исключений
+Expression* Var::simplified(const Context& ctx) {
+    if (ctx.varIsSet(name_)) {
+        // тут уж точно не будет исключений
+        return new Val(ctx.getVar(name_));
+    }
 
     return new Var(*this);
 }
@@ -316,7 +320,9 @@ Expression* Add::simplified(const Context& ctx) const {
 Или даже, по аналогии с переменными, ввели функцию
 
 [code,cpp]
+----
 virtual bool canEval(const Context& ctx) const;
+----
 
 ifdef::backend-revealjs[=== !]
 
@@ -358,17 +364,20 @@ ifdef::backend-revealjs[=== !]
 Expression* Add::simplified(const Context& ctx) const {
     std::unique_ptr<Expression> lhs1(lhs_->simplified(ctx));
     std::unique_ptr<Expression> rhs1(lhs_->simplified(ctx));
-    // если из rhs_->simplified(ctx) вылетит исключение, то мы очистим rhs1
+    // если из rhs_->simplified(ctx) вылетит исключение,
+    // то мы очистим rhs1
 
     if (lhs1->isVal() && rhs1->isVal()) {
         Expression* result = new Val(lhs1->eval() + rhs1->eval());
-        // если из new Val вылетит исключение, то мы очистим lhs1 и rhs1
+        // если из new Val вылетит исключение,
+        // то мы очистим lhs1 и rhs1
         lhs1.reset();
         rhs1.reset();
         return result;
     }
 
     return new Add(std::move(lhs1), std::move(rhs1));
-    // если из new Add вылетит исключение, то мы очистим временные объекты
+    // если из new Add вылетит исключение,
+    // то мы очистим временные объекты
 }
 ----
