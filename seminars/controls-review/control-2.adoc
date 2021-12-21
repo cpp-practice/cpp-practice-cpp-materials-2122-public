@@ -48,10 +48,10 @@ class Add: public Expression {
 public:
     Add(Expression* lhs, Expression* rhs):
         Add(EPtr(lhs), EPtr(rhs)) {}
-
     // ~Add() = default;
 private:
-    Add(EPtr lhs, EPtr rhs) : lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
+    Add(EPtr lhs, EPtr rhs) :
+        lhs_(std::move(lhs)), rhs_(std::move(rhs)) {}
     EPtr lhs_;
     EPtr rhs_;
 
@@ -115,7 +115,8 @@ private:
     Expression* rhs_;
     // ну или std::unique_ptr
 protected:
-    Binary(Expression* lhs, Expression* rhs) : lhs_(lhs), rhs_(rhs) {}
+    Binary(Expression* lhs, Expression* rhs) :
+        lhs_(lhs), rhs_(rhs) {}
     ~Binary() override {
         delete lhs_;
         delete rhs_;
@@ -255,7 +256,7 @@ ifdef::backend-revealjs[=== !]
 
 [source,cpp]
 ----
-Expression* Val::simplified(const Context& ctx) {
+Expression* Var::simplified(const Context& ctx) {
     // если можно вычислить как константу
     return new Val(eval(ctx));
     // иначе - возвращаем копию себя
@@ -364,20 +365,17 @@ ifdef::backend-revealjs[=== !]
 Expression* Add::simplified(const Context& ctx) const {
     std::unique_ptr<Expression> lhs1(lhs_->simplified(ctx));
     std::unique_ptr<Expression> rhs1(lhs_->simplified(ctx));
-    // если из rhs_->simplified(ctx) вылетит исключение,
-    // то мы очистим rhs1
+    // если из rhs_->simplified(ctx) вылетит исключение, очистим rhs1
 
     if (lhs1->isVal() && rhs1->isVal()) {
         Expression* result = new Val(lhs1->eval() + rhs1->eval());
-        // если из new Val вылетит исключение,
-        // то мы очистим lhs1 и rhs1
+        // если из new Val вылетит исключение, очистим lhs1 и rhs1
         lhs1.reset();
         rhs1.reset();
         return result;
     }
 
     return new Add(std::move(lhs1), std::move(rhs1));
-    // если из new Add вылетит исключение,
-    // то мы очистим временные объекты
+    // если из new Add вылетит исключение, очистим временные объекты
 }
 ----
