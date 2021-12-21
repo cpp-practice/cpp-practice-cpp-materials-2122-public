@@ -26,7 +26,7 @@
 
 == Как сделать буфер под хранимый объект?
 
-[code,cpp]
+[source,cpp]
 ----
 T obj_;  // (1) - сразу неправильно
 
@@ -40,7 +40,7 @@ U buf_;
 
 === Сырой буфер проще всего сделать так:
 
-[code,cpp]
+[source,cpp]
 ----
 alignas(T) char buf_[sizeof(T)];
 std::aligned_storage_t<sizeof(T), alignof(T)> buf_;  // или так
@@ -51,7 +51,7 @@ const T& value() { return reinterpret_cast<const T&>(buf_); }
 
 === Допилить напильником union
 
-[code,cpp]
+[source,cpp]
 ----
 union U {
     T obj_;
@@ -70,7 +70,7 @@ T& value() { return buf_.obj_; }
 
 == Требования к типу объекта.
 
-[code,cpp]
+[source,cpp]
 ----
 maybe<T> x;  // единственное требование - Destructible
 
@@ -86,7 +86,7 @@ z.emplace(A{}, B{});
 
 === Как возникают избыточные требования?
 
-[code,cpp]
+[source,cpp]
 ----
 maybe(const maybe& other)
     // : maybe()

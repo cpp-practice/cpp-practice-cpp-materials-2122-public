@@ -320,7 +320,7 @@ Expression* Add::simplified(const Context& ctx) const {
 
 Или даже, по аналогии с переменными, ввели функцию
 
-[code,cpp]
+[source,cpp]
 ----
 virtual bool canEval(const Context& ctx) const;
 ----
