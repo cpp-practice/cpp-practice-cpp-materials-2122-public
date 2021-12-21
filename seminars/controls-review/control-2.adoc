@@ -109,6 +109,23 @@ ifdef::backend-revealjs[=== !]
 [source,cpp]
 ----
 class Binary: public Expression {
+// владение операндами
+private:
+    Expression* lhs_;
+    Expression* rhs_;
+    // ну или std::unique_ptr
+protected:
+    Binary(Expression* lhs, Expression* rhs) : lhs_(lhs), rhs_(rhs) {}
+    ~Binary() override {
+        delete lhs_;
+        delete rhs_;
+    }
+----
+
+ifdef::backend-revealjs[=== !]
+
+[source,cpp]
+----
 // функции печати
 protected:
     virtual bool parentheses() const = 0;
@@ -212,9 +229,9 @@ private:
 
 === В чём разница между подстановкой и упрощением
 
-- подстановка: `(x + y * z)` при y=2, z=3 ==> `(x + 2 * 3)`
-- упрощение: `(x + y * z)` при y=2, z=3 ==> `(x + 6)`
-- оптимизация: `(x + 0)` ==> `x`, `x * 1` ==> `x`, `x * 0` ==> `0`
+- подстановка: `(x + y * z)` при y=2, z=3 => `(x + 2 * 3)`
+- упрощение: `(x + y * z)` при y=2, z=3 => `(x + 6)`
+- оптимизация: `(x + 0)` ==> `x`, `x * 1` => `x`, `x * 0` => `0`
 
 Нам нужно было только упрощение, без оптимизации.
 
