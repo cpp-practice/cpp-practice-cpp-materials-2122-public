@@ -1,4 +1,4 @@
-# Система оценки [Draft]
+# Система оценки
 
 Оценки по все активностям будут выставляться в общую ведомость: [link](https://docs.google.com/spreadsheets/d/15CNIxcJV6dVjSQL6dwiE8mfm-uOmQ_tNXRoJSMkCvu4/edit)
 
@@ -86,11 +86,4 @@
 ##### ITMO/HSE (экзамен обязателен)
 
 Итоговая оценка: `AVG(activities, exam)`
-
-
-
-
-
-
-
 
